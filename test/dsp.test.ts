@@ -1,104 +1,78 @@
-/**
- * Dev-only verification for the pure DSP core embedded in frequency-lab.html.
- * Extracts the code between the DSP markers and exercises it outside the browser.
- *
- * Run: node verify-dsp.mjs
- */
-import { readFileSync } from 'node:fs';
+import { test } from 'vitest';
+import { FreqLabDSP as DSP } from '../src/dsp/core';
 
-const HTML_PATH = new URL('./frequency-lab.html', import.meta.url);
-
-let failures = 0;
 let passes = 0;
+let failures = 0;
 
-function check(name, fn) {
-  try {
-    fn();
-    passes++;
-    console.log(`ok   ${name}`);
-  } catch (error) {
-    failures++;
-    console.error(`FAIL ${name}`);
-    console.error(`     ${error.message}`);
-  }
-}
-
-function near(actual, expected, tolerance, label = 'value') {
+function near(actual: number, expected: number, tolerance: number, label = 'value') {
   if (!Number.isFinite(actual) || Math.abs(actual - expected) > tolerance) {
     throw new Error(`${label}: expected ${expected} ±${tolerance}, got ${actual}`);
   }
 }
 
-function equal(actual, expected, label = 'value') {
+function equal(actual: unknown, expected: unknown, label = 'value') {
   if (actual !== expected) {
     throw new Error(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
   }
 }
 
-const html = readFileSync(HTML_PATH, 'utf8');
-const marker = /\/\* DSP:CORE:START \*\/([\s\S]*?)\/\* DSP:CORE:END \*\//;
-const match = html.match(marker);
-if (!match) throw new Error('DSP markers not found in frequency-lab.html');
-
-const DSP = new Function(`${match[1]}\nreturn FreqLabDSP;`)();
-
-check('noteFor(440) is A4 with zero cents', () => {
+test('noteFor(440) is A4 with zero cents', () => {
   const note = DSP.noteFor(440);
   equal(note.name, 'A4', 'note');
   near(note.cents, 0, 1e-6, 'cents');
 });
 
-check('noteFor(432) is A4, 31.77 cents flat', () => {
+test('noteFor(432) is A4, 31.77 cents flat', () => {
   const note = DSP.noteFor(432);
   equal(note.name, 'A4', 'note');
   near(note.cents, -31.766, 0.05, 'cents');
 });
 
-check('noteFor(261.625565) is C4', () => {
+test('noteFor(261.625565) is C4', () => {
   const note = DSP.noteFor(261.625565);
   equal(note.name, 'C4', 'note');
 });
 
-check('noteFor(3520) is A7', () => {
+test('noteFor(3520) is A7', () => {
   equal(DSP.noteFor(3520).name, 'A7');
 });
 
-check('noteFor rejects invalid input', () => {
+test('noteFor rejects invalid input', () => {
   equal(DSP.noteFor(0), null);
   equal(DSP.noteFor(-440), null);
   equal(DSP.noteFor(NaN), null);
 });
 
-check('parabolicOffset recovers a +0.2 bin peak', () => {
+test('parabolicOffset recovers a +0.2 bin peak', () => {
   near(DSP.parabolicOffset(-1.44, -0.04, -0.64), 0.2, 1e-9);
 });
 
-check('parabolicOffset is zero for a symmetric peak', () => {
+test('parabolicOffset is zero for a symmetric peak', () => {
   near(DSP.parabolicOffset(-1, 0, -1), 0, 1e-12);
 });
 
-check('parabolicOffset ignores non-finite neighbours', () => {
+test('parabolicOffset ignores non-finite neighbours', () => {
   equal(DSP.parabolicOffset(-Infinity, -20, -Infinity), 0);
   equal(DSP.parabolicOffset(NaN, -20, -30), 0);
 });
 
-check('parabolicOffset clamps to half a bin', () => {
+test('parabolicOffset clamps to half a bin', () => {
   near(DSP.parabolicOffset(-100, 0, 0), 0.5, 1e-12);
   near(DSP.parabolicOffset(0, 0, -100), -0.5, 1e-12);
 });
 
-check('median handles odd and even lengths', () => {
+test('median handles odd and even lengths', () => {
   near(DSP.median([3, 1, 2]), 2, 1e-12);
   near(DSP.median([4, 1, 3, 2]), 2.5, 1e-12);
 });
 
-check('noiseFloor ignores a loud tone', () => {
+test('noiseFloor ignores a loud tone', () => {
   const db = new Float32Array(1000).fill(-90);
   for (let i = 100; i <= 110; i++) db[i] = -20;
   near(DSP.noiseFloor(db, 20, 900, 8), -90, 1e-9);
 });
 
-check('pickPeaks finds a tone with sub-bin interpolation', () => {
+test('pickPeaks finds a tone with sub-bin interpolation', () => {
   const sr = 48000;
   const fft = 32768;
   const binHz = sr / fft;
@@ -113,7 +87,7 @@ check('pickPeaks finds a tone with sub-bin interpolation', () => {
   near(peaks[0].db, -20, 1e-6, 'peak db');
 });
 
-check('pickPeaks includes the 20 Hz boundary', () => {
+test('pickPeaks includes the 20 Hz boundary', () => {
   const sr = 48000;
   const fft = 32768;
   const binHz = sr / fft;
@@ -128,7 +102,7 @@ check('pickPeaks includes the 20 Hz boundary', () => {
   }
 });
 
-check('pickPeaks includes the 20 kHz boundary', () => {
+test('pickPeaks includes the 20 kHz boundary', () => {
   const sr = 48000;
   const fft = 32768;
   const binHz = sr / fft;
@@ -143,7 +117,7 @@ check('pickPeaks includes the 20 kHz boundary', () => {
   }
 });
 
-check('pickPeaks excludes sub-20 Hz and above-20 kHz peaks', () => {
+test('pickPeaks excludes sub-20 Hz and above-20 kHz peaks', () => {
   const sr = 48000;
   const fft = 32768;
   const db = new Float32Array(fft / 2).fill(-100);
@@ -153,7 +127,7 @@ check('pickPeaks excludes sub-20 Hz and above-20 kHz peaks', () => {
   equal(peaks.length, 0, 'peak count');
 });
 
-check('pickPeaks ignores levels below the absolute floor', () => {
+test('pickPeaks ignores levels below the absolute floor', () => {
   const sr = 48000;
   const fft = 32768;
   const db = new Float32Array(fft / 2).fill(-160);
@@ -170,7 +144,7 @@ check('pickPeaks ignores levels below the absolute floor', () => {
   equal(peaks.length, 0, 'peak count');
 });
 
-check('pickPeaks returns at most six peaks, strongest first', () => {
+test('pickPeaks returns at most six peaks, strongest first', () => {
   const sr = 48000;
   const fft = 32768;
   const binHz = sr / fft;
@@ -189,7 +163,7 @@ check('pickPeaks returns at most six peaks, strongest first', () => {
   }
 });
 
-check('bandPowerDb averages power rather than dB', () => {
+test('bandPowerDb averages power rather than dB', () => {
   const flat = new Float32Array(10).fill(-60);
   near(DSP.bandPowerDb(flat, 0, 9), -60, 1e-9);
   const mixed = new Float32Array(4);
@@ -200,7 +174,7 @@ check('bandPowerDb averages power rather than dB', () => {
   near(DSP.bandPowerDb(mixed, 0, 3), 10 * Math.log10((2e-6 + 2e-5) / 4), 1e-9);
 });
 
-check('targetEvidence detects a tone inside the band', () => {
+test('targetEvidence detects a tone inside the band', () => {
   const sr = 48000;
   const fft = 32768;
   const binHz = sr / fft;
@@ -225,7 +199,7 @@ check('targetEvidence detects a tone inside the band', () => {
   if (!(ev.prominenceDb > 50)) throw new Error(`expected high prominence, got ${ev.prominenceDb}`);
 });
 
-check('targetEvidence clamps a wide tolerance to the 20 Hz edge', () => {
+test('targetEvidence clamps a wide tolerance to the 20 Hz edge', () => {
   const sr = 48000;
   const fft = 32768;
   const binHz = sr / fft;
@@ -245,13 +219,13 @@ check('targetEvidence clamps a wide tolerance to the 20 Hz edge', () => {
   equal(ev.tonePresent, false, 'tonePresent');
 });
 
-check('maxTargetHz follows Nyquist', () => {
+test('maxTargetHz follows Nyquist', () => {
   equal(DSP.maxTargetHz(48000), 20000);
   equal(DSP.maxTargetHz(32000), 16000);
   equal(DSP.maxTargetHz(96000), 20000);
 });
 
-check('targetEvidence accepts a 20 kHz target at 48 kHz', () => {
+test('targetEvidence accepts a 20 kHz target at 48 kHz', () => {
   const sr = 48000;
   const fft = 32768;
   const binHz = sr / fft;
@@ -270,7 +244,7 @@ check('targetEvidence accepts a 20 kHz target at 48 kHz', () => {
   equal(ev.tonePresent, true, 'tonePresent');
 });
 
-check('targetEvidence rejects an empty band', () => {
+test('targetEvidence rejects an empty band', () => {
   const sr = 48000;
   const fft = 32768;
   const db = new Float32Array(fft / 2).fill(-100);
@@ -285,7 +259,7 @@ check('targetEvidence rejects an empty band', () => {
   equal(ev.tonePresent, false, 'tonePresent');
 });
 
-check('buildLogRows maps top to high frequency, bottom to low', () => {
+test('buildLogRows maps top to high frequency, bottom to low', () => {
   const rows = DSP.buildLogRows(256, 20, 20000, 48000, 8192, 4096);
   equal(rows.length, 256, 'row count');
   near(rows[0].hz, 20000, 1e-6, 'first hz');
@@ -296,13 +270,13 @@ check('buildLogRows maps top to high frequency, bottom to low', () => {
   if (!(rows[0].bin > rows[255].bin)) throw new Error('row bins are not descending');
 });
 
-check('finalizeBucket marks presence only for a tone majority', () => {
+test('finalizeBucket marks presence only for a tone majority', () => {
   equal(DSP.finalizeBucket(10, 6).present, true);
   equal(DSP.finalizeBucket(10, 4).present, false);
   equal(DSP.finalizeBucket(0, 0).signal, false);
 });
 
-check('summarizeBuckets counts signal buckets only', () => {
+test('summarizeBuckets counts signal buckets only', () => {
   const summary = DSP.summarizeBuckets([
     { signal: true, present: true },
     { signal: true, present: false },
@@ -315,13 +289,10 @@ check('summarizeBuckets counts signal buckets only', () => {
   equal(DSP.summarizeBuckets([]).percent, null, 'empty percent');
 });
 
-check('verdictFor thresholds', () => {
+test('verdictFor thresholds', () => {
   equal(DSP.verdictFor(90, 40), 'consistent');
   equal(DSP.verdictFor(50, 40), 'intermittent');
   equal(DSP.verdictFor(5, 40), 'not-detected');
   equal(DSP.verdictFor(null, 0), 'no-signal');
   equal(DSP.verdictFor(100, 4), 'collecting');
 });
-
-console.log(`\n${passes} passed, ${failures} failed`);
-if (failures > 0) process.exitCode = 1;

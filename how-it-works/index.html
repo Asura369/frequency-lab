@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page">
+<!-- SITE:NAV -->
+<main id="main">
+  <article class="prose">
+    <p class="eyebrow">Method</p>
+    <h1>How the measurement works</h1>
+    <p class="lede">Enough detail to judge the numbers — and to know when not to trust them. Everything here is implemented in the page you can open; there is no hidden model.</p>
+
+    <h2>The short version</h2>
+    <p>Audio is captured or decoded, a 32,768-sample window is analysed roughly 60 times per second, the strongest peaks are found above a median noise floor, and a target band is checked for a tone-like peak. Evidence is counted over time instead of reported as a single frame.</p>
+
+    <h2>Resolution and the analysis window</h2>
+    <p>The fine spectrum uses an FFT of 32,768 samples. At 48 kHz that is a bin every <strong>1.46 Hz</strong> and a window of about <strong>0.68 s</strong>; at 44.1 kHz it is 1.35 Hz and 0.74 s. The browser applies a window function before the transform, so a steady tone appears as a peak a few bins wide, not a single line.</p>
+    <p>Two consequences follow. First, two tones closer than roughly 1.5 Hz merge into one peak. Second, anything that changes faster than about 0.7 s is smeared across the window. That is why the readout lags a fast vibrato and why the spectrogram is the better view for rhythm.</p>
+
+    <h2>Dominant peak and the peak list</h2>
+    <p>Each frame, the analyser returns dB per bin. The workbench:</p>
+    <ol>
+      <li>estimates the noise floor as the median of every eighth bin between 20 Hz and 20 kHz;</li>
+      <li>keeps local maxima that are louder than the floor by 6 dB and above an absolute −100 dB level;</li>
+      <li>measures <em>salience</em> — the peak level minus the median of its sidebands 4–32 bins away;</li>
+      <li>rejects peaks with less than 6 dB of salience, suppresses neighbours within 8 bins, and keeps the six strongest;</li>
+      <li>refines the centre with a parabolic fit over the three nearest bins, which recovers a fraction of a bin.</li>
+    </ol>
+    <p>The headline number is the strongest peak, smoothed over five frames. The peak table stays instantaneous, so you can see it flicker when the source does.</p>
+
+    <h2>Note and cents</h2>
+    <p>The note is derived from equal temperament with A4 = 440 Hz: <code>midi = 69 + 12·log₂(f / 440)</code>. Cents are <code>(midi − nearest)·100</code>, so 432 Hz reads as A4 −31.8 cents. Sharps are used throughout. This is a reference calculation, not a claim that the music is in that key.</p>
+
+    <h2>Target evidence</h2>
+    <p>For a target <code>f</code> and tolerance <code>±t</code>:</p>
+    <ul>
+      <li><strong>Band SNR</strong> is the power-averaged level of the bins inside the band minus the noise floor.</li>
+      <li><strong>Prominence</strong> is the loudest bin in the band minus the median of the surrounding sidebands.</li>
+      <li>A frame counts as <em>tone present</em> when band SNR ≥ 6 dB <em>and</em> prominence ≥ 6 dB.</li>
+    </ul>
+    <p>Frames are grouped into 100 ms buckets. A bucket counts as present when at least half of its signal frames detect a tone. The percentages ignore silent buckets, so they answer “when there was signal, how often was the target there?” — not “how often was there sound?”.</p>
+    <p>The verdict uses the session percentage: 80% or more is <strong>consistent</strong>, 20–80% is <strong>intermittent</strong>, below 20% is <strong>not detected</strong>. With fewer than ten signal buckets it reports <strong>collecting</strong> instead of guessing.</p>
+
+    <h2>The signal gate</h2>
+    <p>A session is considered live above roughly −70 dBFS RMS and goes quiet below −75 dBFS, with hysteresis (3 frames on, 8 frames off). The dB values are relative to full scale, not calibrated sound pressure. Microphone processing — echo cancellation, noise suppression and automatic gain — is disabled, but the microphone’s own sensitivity is unknown, so do not read dB as SPL.</p>
+
+    <h2>The spectrogram</h2>
+    <p>The waterfall uses a separate 8,192-sample FFT, one column every 40 ms, 20 Hz–20 kHz on a log axis, and colour mapped from −100 to −30 dB. The window shown in the interface is the time span of the visible texture (roughly 20–40 s depending on width). Pausing freezes the columns; the analysis and audio keep running.</p>
+
+    <h2>What it cannot tell you</h2>
+    <ul>
+      <li><strong>The pitch of a chord or a mix.</strong> A spectrum peak is a partial, not a fundamental. See <a href="/guides/why-loudest-peak-isnt-pitch/">the guide</a>.</li>
+      <li><strong>Sound pressure level or “dose”.</strong> No calibration, no weighting curve, no dosimeter maths.</li>
+      <li><strong>Whether an effect is real.</strong> A tone at 528 Hz is a tone at 528 Hz; the workbench stops there.</li>
+      <li><strong>Anything below 20 Hz.</strong> The analysis floor is 20 Hz, and laptop microphones roll off well before 7.83 Hz.</li>
+      <li><strong>Sub-bin truth.</strong> Interpolation improves a clean peak; it does not create resolution that the window does not have.</li>
+    </ul>
+
+    <h2>How the tool checks itself</h2>
+    <p>“Run self-test” drives an internal oscillator at 440, 432 and 528 Hz and asserts a reading within ±0.2 Hz. The same test runs in the automated browser suite. It exercises the audio graph, both analysers and the readout without needing a microphone.</p>
+
+    <div class="cta-box">
+      <div>
+        <strong>Open it and watch the numbers move.</strong>
+        <p>The workbench is the documentation: every threshold above is visible in the interface.</p>
+      </div>
+      <a class="btn btn-primary" href="/app/">Open the lab</a>
+    </div>
+  </article>
+</main>
+<!-- SITE:FOOTER -->
+</body>
+</html>

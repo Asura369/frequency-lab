@@ -1,0 +1,29 @@
+{
+  "name": "frequency-lab",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": ">=20.19" },
+  "type": "module",
+  "description": "Local-first frequency verification workbench for tones, tracks, and tab audio.",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:site && npm run build:standalone && node scripts/copy-standalone.mjs",
+    "build:site": "vite build",
+    "build:standalone": "vite build --config vite.standalone.config.ts",
+    "preview": "node scripts/preview.mjs --port 4173",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "check:links": "node scripts/check-links.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.0.0",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.5",
+    "vite-plugin-singlefile": "^2.3.4",
+    "vitest": "^5.0.5"
+  }
+}

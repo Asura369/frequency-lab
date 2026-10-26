@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page">
+<!-- SITE:NAV -->
+<main id="main">
+  <article class="prose">
+    <p class="eyebrow">Privacy</p>
+    <h1>Your audio does not leave the browser</h1>
+    <p class="lede">Frequency Lab is a static website. The microphone, tab capture and file decoding all run in your browser, and there is no server-side analysis to send audio to.</p>
+
+    <h2>What is processed, and where</h2>
+    <p>Microphone samples arrive through <code>getUserMedia</code>, tab audio through <code>getDisplayMedia</code>, and files through the browser’s own decoder. All of it goes into a Web Audio graph in the page. The analysis buffers exist in memory only and are discarded when you press Stop or close the tab.</p>
+    <p>Nothing is uploaded. There is no recording, no clip storage and no request that carries audio or measurements. File object URLs are revoked when a session ends.</p>
+
+    <h2>What is stored</h2>
+    <p>Two things can persist on your device:</p>
+    <ul>
+      <li><strong>Preferences</strong> in <code>localStorage</code> under <code>freqlab.settings.v1</code>: the last target frequency, tolerance and plot palette. No audio, no identifiers.</li>
+      <li><strong>Saved files</strong> you exported yourself (CSV or PNG), wherever your browser puts downloads.</li>
+    </ul>
+    <p>Clearing site data removes the preferences. The site works without them.</p>
+
+    <h2>No tracking, no accounts</h2>
+    <p>There are no accounts, no cookies, no analytics scripts and no third-party embeds. No fonts, scripts or images are loaded from another origin. You can verify this in the network panel: every request goes to this site.</p>
+    <p>If you install the site as an app, its service worker caches the interface files on your device for offline use. That cache contains no audio and no personal data.</p>
+    <p>The site is served by a static host, which keeps ordinary request logs (IP address, user agent, requested path) for operational and abuse purposes, as any web server does. Those logs do not contain audio.</p>
+
+    <h2>Permissions</h2>
+    <p>Microphone and tab capture are requested only when you press the corresponding button, and they require a secure context (HTTPS or <code>localhost</code>). The browser shows its own capture indicator while a session is live. Stop releases the tracks immediately.</p>
+
+    <h2>Clipboard</h2>
+    <p>“Copy setup link” and “Copy summary” write text to your clipboard only after you press them. The setup link contains the target frequency and tolerance — no measurements, no identifiers.</p>
+
+    <h2>Contact</h2>
+    <p>This is an independent project. A contact address will be published with the launch domain; until then, the site makes no promises it cannot keep about support.</p>
+
+    <p><a href="/">← Back to Frequency Lab</a></p>
+  </article>
+</main>
+<!-- SITE:FOOTER -->
+</body>
+</html>

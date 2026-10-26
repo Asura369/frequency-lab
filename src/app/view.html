@@ -1,0 +1,143 @@
+<!-- Shared workbench markup: used by /app and the standalone build. -->
+<div class="shell">
+  <div class="app-bar">
+    <button id="paletteBtn" class="small ghost" type="button" aria-pressed="false" aria-label="Toggle high-contrast plots">High contrast</button>
+    <div class="status-line" aria-live="polite">
+      <span id="status" role="status">Idle — choose a source.</span>
+      <span class="signal-dot" id="signalDot" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <section class="sourcebar" aria-label="Audio source">
+    <div class="sources">
+      <button id="micBtn" class="primary" type="button">Microphone</button>
+      <button id="tabBtn" type="button">Tab audio</button>
+      <label class="file-btn" id="fileBtn" for="fileInput">Open file
+        <input id="fileInput" type="file" accept="audio/*,video/*">
+      </label>
+      <button id="stopBtn" class="ghost" type="button" disabled>Stop</button>
+    </div>
+    <div class="hint">Audio is analysed in this tab and never uploaded. Drop an audio or video file anywhere.</div>
+  </section>
+
+  <div class="notice" id="protocolNotice" hidden>
+    Mic and tab capture are blocked when this page is opened as a file. Serve the folder over <code>http://localhost</code> (for example <code>python3 -m http.server 8000</code>), or use <strong>Open file</strong>.
+  </div>
+
+  <div class="player" id="playerWrap" hidden>
+    <div class="player-media" id="playerHost"></div>
+    <div class="file-meta">
+      <strong id="fileName">—</strong>
+      <span id="fileKind">—</span>
+    </div>
+  </div>
+
+  <main class="workspace">
+    <section class="card scope" aria-label="Spectrum plots">
+      <div class="card-head">
+        <h2>Live spectrum</h2>
+        <div class="meta" id="engineMeta">Idle</div>
+      </div>
+      <canvas id="spectrum" height="150" aria-label="Live frequency spectrum, 20 Hz to 20 kHz"></canvas>
+
+      <div class="card-head sub">
+        <h2>Spectrogram</h2>
+        <div class="row-mini">
+          <span class="meta" id="specWindow">—</span>
+          <button id="pauseBtn" class="small ghost" type="button" disabled aria-label="Pause the spectrogram waterfall" title="Pause the spectrogram waterfall">Pause</button>
+        </div>
+      </div>
+      <canvas id="spectrogram" height="240" aria-label="Scrolling spectrogram, time on the horizontal axis"></canvas>
+      <div class="legend">
+        <span>−100 dB</span>
+        <span class="grad" aria-hidden="true"></span>
+        <span>−30 dB</span>
+        <span class="legend-time">time →</span>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="card verify" aria-label="Target verification">
+        <div class="card-head">
+          <h2>Verify frequency</h2>
+          <span class="verdict" id="verdict">idle</span>
+        </div>
+
+        <div class="target-row">
+          <label class="field" for="targetInput">
+            <span>Target Hz</span>
+            <input id="targetInput" type="number" min="20" max="20000" step="0.1" value="440" inputmode="decimal">
+          </label>
+          <label class="field" for="tolInput">
+            <span>Tolerance ± Hz</span>
+            <input id="tolInput" type="number" min="0.1" max="50" step="0.1" value="3" inputmode="decimal">
+          </label>
+        </div>
+
+        <div class="presets" id="presets" aria-label="Target presets"></div>
+
+        <div class="readout">
+          <span class="hz no-signal" id="freq">—</span>
+          <span class="unit">Hz</span>
+        </div>
+        <div class="note-line" id="noteLine">Idle</div>
+
+        <div class="metrics">
+          <div class="metric"><span>Band SNR</span><strong id="snr">—</strong></div>
+          <div class="metric"><span>Last 10 s</span><strong id="pct10">—</strong></div>
+          <div class="metric"><span>Session</span><strong id="pctAll">—</strong></div>
+        </div>
+
+        <div class="bar" aria-hidden="true"><div id="snrBar"></div></div>
+        <p class="verdict-text" id="verdictText">Start a source, then check whether its energy actually sits at the target frequency.</p>
+      </section>
+
+      <section class="card peaks" aria-label="Strongest spectral peaks">
+        <div class="card-head">
+          <h2>Strongest peaks</h2>
+          <span class="meta">dominant first</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Hz</th><th>Note</th><th>dB</th><th>Prom</th></tr>
+          </thead>
+          <tbody id="peakRows">
+            <tr><td class="empty" colspan="5">No analysis yet.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card export" aria-label="Export">
+        <div class="card-head"><h2>Export</h2><span class="meta">local only</span></div>
+        <div class="actions">
+          <button id="exportCsv" type="button" disabled>CSV · 10 Hz</button>
+          <button id="exportPng" type="button" disabled>PNG view</button>
+          <button id="copyLink" class="small ghost" type="button">Copy setup link</button>
+          <button id="copyResult" class="small ghost" type="button" disabled>Copy summary</button>
+        </div>
+        <p class="fine">CSV records the dominant peak, target SNR and tone presence. A PNG snapshots both plots. The setup link reopens this target and tolerance.</p>
+      </section>
+    </aside>
+  </main>
+
+  <details class="diagnostics">
+    <summary>Diagnostics &amp; self-test</summary>
+    <div class="diag-body">
+      <label class="field" for="toneFreq">
+        <span>Test tone Hz</span>
+        <input id="toneFreq" type="number" min="20" max="20000" step="0.1" value="440" inputmode="decimal">
+      </label>
+      <button id="toneBtn" class="small" type="button">Start tone</button>
+      <button id="selfTestBtn" class="small" type="button">Run self-test</button>
+      <span class="diag-note" id="diagMeta">The self-test uses an internal oscillator; no microphone permission needed.</span>
+      <span class="shortcuts">Keys: <kbd>P</kbd> pause · <kbd>S</kbd> stop · <kbd>E</kbd> export CSV</span>
+      <div class="test-result" id="selfTestOut"></div>
+    </div>
+  </details>
+
+  <div class="app-note">
+    <span>Dominant peaks are not musical pitch. A target verdict is evidence over time, not proof of intent.</span>
+    <span>Web Audio · no network · no recording</span>
+  </div>
+</div>
+

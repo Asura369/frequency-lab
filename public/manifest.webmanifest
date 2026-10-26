@@ -1,0 +1,30 @@
+{
+  "name": "Frequency Lab",
+  "short_name": "FreqLab",
+  "description": "Local-first spectrum and target-frequency verification. Audio never leaves the device.",
+  "id": "/app/",
+  "start_url": "/app/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080a0e",
+  "theme_color": "#080a0e",
+  "categories": ["utilities", "music"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Verify 528 Hz", "short_name": "528 Hz", "url": "/app/?t=528&tol=3" },
+    { "name": "Verify 432 Hz", "short_name": "432 Hz", "url": "/app/?t=432&tol=1" }
+  ],
+  "file_handlers": [
+    {
+      "action": "/app/",
+      "accept": {
+        "audio/*": [".mp3", ".wav", ".flac", ".m4a", ".aac", ".ogg", ".opus"],
+        "video/*": [".mp4", ".webm", ".mov", ".mkv", ".ogv"]
+      }
+    }
+  ]
+}

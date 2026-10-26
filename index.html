@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page page--home">
+<!-- SITE:NAV -->
+<main id="main">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <p class="eyebrow">Local signal analysis</p>
+      <h1>Is it <em>really</em> at that frequency?</h1>
+      <p class="hero-lede">Point Frequency Lab at a track, a video, or the room. See the dominant peaks, a scrolling spectrogram, and how much of the time your target frequency is actually there. Everything runs in this tab — nothing is uploaded.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/app/">Open the lab</a>
+        <a class="btn btn-secondary" href="/how-it-works/">How the numbers work</a>
+      </div>
+      <ul class="hero-proof">
+        <li>Audio stays on your device</li>
+        <li>No account</li>
+        <li>Works offline</li>
+      </ul>
+    </div>
+
+    <div class="demo" data-demo>
+      <div class="demo-head"><span>Live demo</span><span class="demo-live">Oscillator</span></div>
+      <canvas class="demo-canvas" data-demo-canvas aria-label="Spectrum of the test tone" role="img"></canvas>
+      <div class="demo-readout">
+        <span class="demo-hz idle" data-demo-hz>—</span>
+        <span class="demo-unit">Hz</span>
+      </div>
+      <div class="demo-note" data-demo-note>Press a tone to hear it and measure it here.</div>
+      <div class="demo-chips" role="group" aria-label="Test tones">
+        <button type="button" data-demo-tone="432">432 Hz</button>
+        <button type="button" data-demo-tone="440">440 Hz</button>
+        <button type="button" data-demo-tone="528">528 Hz</button>
+      </div>
+      <p class="demo-foot">A synthesised sine through your speakers. The microphone is never used here.</p>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="answers">
+    <div class="section-head">
+      <p class="eyebrow">What it does</p>
+      <h2 id="answers">One question, answered with evidence</h2>
+      <p>Most audio tools show a number. Frequency Lab shows whether that number holds up — in a steady tone, across a whole track, or on a video someone sent you.</p>
+    </div>
+    <div class="grid-3">
+      <article class="card">
+        <span class="num">01 — VERIFY</span>
+        <h3>Is this tone at 528 Hz?</h3>
+        <p>Set a target and a tolerance. The verdict counts how many signal frames actually contain a tone-like peak inside that band — over the last 10 seconds and the whole session.</p>
+      </article>
+      <article class="card">
+        <span class="num">02 — SEE</span>
+        <h3>What else is in here?</h3>
+        <p>A log-frequency spectrum from 20 Hz to 20 kHz, a scrolling spectrogram, and the six strongest peaks with their salience above the noise floor.</p>
+      </article>
+      <article class="card">
+        <span class="num">03 — PROVE</span>
+        <h3>Can I show someone?</h3>
+        <p>Export the measurements as CSV or a PNG of both plots. The setup travels in the URL, so a link can open the workbench at exactly your target.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="see-it">
+    <div class="section-head">
+      <p class="eyebrow">The workbench</p>
+      <h2 id="see-it">Built for checking, not guessing</h2>
+      <p>Microphone, tab audio, or a local audio/video file. The same measurement core drives all three, and it never leaves the page.</p>
+    </div>
+    <figure class="shot">
+      <img src="/freqlab-preview.png" width="1440" height="1057" alt="Frequency Lab showing a 440 Hz test tone with the spectrum, spectrogram, target evidence and peak table.">
+      <figcaption>440 Hz test tone: dominant peak, note and cents, target verdict, and the waterfall.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section wrap" aria-labelledby="claims">
+    <div class="section-head">
+      <p class="eyebrow">Start with a claim</p>
+      <h2 id="claims">Frequencies people argue about</h2>
+      <p>Open the workbench with a target already set. The presets page explains what each number can and cannot demonstrate.</p>
+    </div>
+    <div class="chips" aria-label="Frequency presets">
+      <a class="chip" href="/app/?t=432&amp;tol=3">432 Hz</a>
+      <a class="chip" href="/app/?t=440&amp;tol=3">440 Hz</a>
+      <a class="chip" href="/app/?t=528&amp;tol=3">528 Hz</a>
+      <a class="chip" href="/app/?t=639&amp;tol=3">639 Hz</a>
+      <a class="chip" href="/app/?t=741&amp;tol=3">741 Hz</a>
+      <a class="chip" href="/app/?t=852&amp;tol=3">852 Hz</a>
+      <a class="chip" href="/app/?t=963&amp;tol=3">963 Hz</a>
+      <a class="chip" href="/presets/">All presets →</a>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="guides">
+    <div class="section-head">
+      <p class="eyebrow">Read first</p>
+      <h2 id="guides">Guides that match the tool</h2>
+      <p>No mysticism and no dismissiveness: what a spectrum can measure, what it cannot, and how to tell the difference.</p>
+    </div>
+    <div class="guide-grid">
+      <a class="guide-card" href="/guides/why-loudest-peak-isnt-pitch/">
+        <h3>Why the loudest frequency is not the pitch</h3>
+        <p>Harmonics, chords and the analysis window — the most common way a frequency reading misleads you.</p>
+        <span class="guide-meta">7 MIN READ</span>
+      </a>
+      <a class="guide-card" href="/guides/check-a-song-or-video-at-528-hz/">
+        <h3>How to check a song or video at 528 Hz</h3>
+        <p>A step-by-step verification, including what a high percentage does not prove.</p>
+        <span class="guide-meta">7 MIN READ</span>
+      </a>
+      <a class="guide-card" href="/guides/verify-432-vs-440/">
+        <h3>How to verify 432 Hz vs 440 Hz</h3>
+        <p>Cents, A4 reference and resampling artefacts — how to test a tuning claim properly.</p>
+        <span class="guide-meta">6 MIN READ</span>
+      </a>
+      <a class="guide-card" href="/guides/solfeggio-frequencies-what-can-be-measured/">
+        <h3>Solfeggio frequencies: what can be measured</h3>
+        <p>Which of the nine common claims are testable with a spectrum, and which are not.</p>
+        <span class="guide-meta">8 MIN READ</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="faq-heading">
+    <div class="section-head">
+      <p class="eyebrow">Questions</p>
+      <h2 id="faq-heading">The honest answers</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Does it upload my audio?</summary>
+        <p>No. The microphone, tab capture and file decoding all happen in your browser, and there is no upload path in the code. There are no accounts, cookies or third-party scripts on this site.</p>
+      </details>
+      <details>
+        <summary>Is this a guitar tuner?</summary>
+        <p>For steady tones it is precise: ±0.2 Hz on a clean test tone, with note and cents. For chords and full mixes, the loudest peak is not the pitch — see <a href="/guides/why-loudest-peak-isnt-pitch/">the guide</a>.</p>
+      </details>
+      <details>
+        <summary>Can it tell me what key a song is in?</summary>
+        <p>Not yet. Key and chroma analysis is the next milestone. Today the tool reports spectral peaks, target evidence and band behaviour.</p>
+      </details>
+      <details>
+        <summary>Can it measure 7.83 Hz or 40 Hz?</summary>
+        <p>40 Hz, yes. 7.83 Hz is below the workbench's 20 Hz floor and below what a typical laptop microphone reproduces. The presets page marks those cases instead of pretending.</p>
+      </details>
+      <details>
+        <summary>Does it work on a phone?</summary>
+        <p>The microphone path works over HTTPS, and files can be opened from local storage. Tab-audio capture is desktop Chrome or Edge only. The interface is responsive and installable as an app.</p>
+      </details>
+      <details>
+        <summary>Is it free?</summary>
+        <p>Yes. It is an independent project with no ads, accounts or paid tier.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="cta-box">
+      <div>
+        <strong>Bring a file. Bring a claim.</strong>
+        <p>Start the workbench, drop an audio or video file, and set the frequency you want to check.</p>
+      </div>
+      <a class="btn btn-primary" href="/app/">Open the lab</a>
+    </div>
+  </section>
+</main>
+<!-- SITE:FOOTER -->
+<script type="module" src="/src/site/demo.ts"></script>
+</body>
+</html>

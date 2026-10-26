@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page">
+<!-- SITE:NAV -->
+<main id="main">
+  <article class="prose">
+    <p class="eyebrow">Guide · 7 min read</p>
+    <h1>How to check a song or video at 528 Hz</h1>
+    <p class="lede">A step-by-step verification, from dropping the file to reading the percentage — and a clear statement of what a high percentage does not prove.</p>
+
+    <h2>Before you start</h2>
+    <p>Use the local file rather than tab capture when you can. A file is decoded by the browser directly, can be paused and replayed at the same point, and is not affected by system volume or other tabs. Tab capture is useful when the audio only exists in another page, but it is the less reliable path.</p>
+
+    <h2>The procedure</h2>
+    <ol>
+      <li><strong>Open the workbench</strong> and choose <em>Open file</em>, or drop the audio or video file anywhere on the page.</li>
+      <li><strong>Set the target to 528 Hz</strong> with a tolerance of ±3 Hz. The preset chip does this in one click.</li>
+      <li><strong>Play the file.</strong> The player appears above the plots; use its controls to seek.</li>
+      <li><strong>Watch the evidence.</strong> “Last 10 s” answers whether the tone was there recently; “Session” answers across the whole playback. Both ignore silence.</li>
+      <li><strong>Read the verdict.</strong> Consistent means 80% or more of signal time; intermittent is 20–80%; below 20% is not detected. Under a second of signal the tool says “collecting” rather than guessing.</li>
+      <li><strong>Confirm on the spectrogram.</strong> A real sustained tone draws a horizontal line at 528 Hz (between the 500 Hz and 1 kHz gridlines) for as long as it sounds.</li>
+      <li><strong>Export if you need a record.</strong> CSV gives 10 Hz rows; the PNG captures both plots with the target band.</li>
+    </ol>
+
+    <h2>What the percentage means</h2>
+    <p>The evidence counts only frames with signal, and only frames where a tone-like peak exists inside the band. So “100% of the last 10 s” means: whenever there was sound, a peak at 528 Hz ±3 was present and prominent. It does not mean 100% of the energy is at 528 Hz, and it does not mean the track is “made of” 528 Hz.</p>
+    <p>A quiet 528 Hz drone under a loud mix can still produce a high percentage, because the test is about presence and prominence above the local floor, not about share of total loudness. Look at band SNR and the peak table if you want to know how dominant the tone is.</p>
+
+    <h2>The common cases</h2>
+    <h3>There is a steady 528 Hz tone</h3>
+    <p>The spectrogram shows a continuous line, the percentage is high, and the peak table lists 528 Hz. That is a legitimate finding: the tone is in the recording. It is also all the finding. Claims about DNA repair or healing are not tested by this measurement.</p>
+
+    <h3>There is no 528 Hz tone</h3>
+    <p>The percentage stays low and the spectrogram has no line at that height. The “528 Hz” claim may refer to a tuning decision, a title, or a carrier that is modulated rather than a constant tone. A low result is a real result, not a failure of the tool.</p>
+
+    <h3>The tone appears and disappears</h3>
+    <p>Intermittent evidence is common when the tone enters for a section, when the mix changes, or when a target band is masked by other content. Scrub through the file and watch when the percentage moves; the spectrogram shows exactly where.</p>
+
+    <h2>For video files</h2>
+    <p>Open the video file the same way. The player handles the picture; the analysis uses its audio track. This is more reliable than capturing a tab, and it lets you check a downloaded video offline. If the audio is part of a live stream, tab capture is the fallback.</p>
+
+    <h2>What you can and cannot conclude</h2>
+    <p><strong>Can conclude:</strong> a tone at 528 Hz is (or is not) present; how consistently; how strong it is relative to the local floor; where in the timeline it appears.</p>
+    <p><strong>Cannot conclude:</strong> that the listener will feel anything; that the file “resonates” with a body part; that its presence validates a health claim. Those are claims about effects, and they require evidence of a different kind. See <a href="/guides/solfeggio-frequencies-what-can-be-measured/">the solfeggio guide</a> for the specifics.</p>
+
+    <div class="callout">
+      <p><strong>Shortcut.</strong> <a href="/app/?t=528&amp;tol=3">Open the workbench at 528 Hz ±3</a> and drop the file.</p>
+    </div>
+
+    <div class="cta-box">
+      <div>
+        <strong>Checking a video someone sent you?</strong>
+        <p>Download it first if you can — local analysis is more stable than tab capture.</p>
+      </div>
+      <a class="btn btn-primary" href="/app/?t=528&amp;tol=3">Open at 528 Hz</a>
+    </div>
+
+    <p><a href="/guides/">← All guides</a></p>
+  </article>
+</main>
+<!-- SITE:FOOTER -->
+</body>
+</html>

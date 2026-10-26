@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page">
+<!-- SITE:NAV -->
+<main id="main">
+  <div class="wrap page-head">
+    <p class="eyebrow">Offline</p>
+    <h1>One HTML file. No network.</h1>
+    <p class="lede">The offline edition is the same workbench bundled into a single self-contained document. Save it, keep it, open it from a USB stick on a machine with no internet.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="download-card">
+      <h2>Frequency Lab, standalone</h2>
+      <p>Includes the markup, styles, measurement core and interface. It does not include the guides or the marketing pages; those need the website.</p>
+      <div class="download-meta">
+        <span>Single HTML file</span>
+        <span>No install</span>
+        <span>No account</span>
+      </div>
+      <div>
+        <a class="btn btn-primary" href="/download/frequency-lab.html" download>Download the offline edition</a>
+      </div>
+      <p class="fine">The file is generated from the same source as the online workbench on every deployment.</p>
+    </div>
+
+    <div class="callout">
+      <p><strong>What works from <code>file://</code>:</strong> opening and analysing a local audio or video file, the internal test tone, the self-test, CSV and PNG export, keyboard shortcuts.</p>
+      <p><strong>What needs a local server:</strong> microphone and tab capture. Browsers treat <code>file://</code> as an insecure origin and block capture APIs. The page will tell you this and stays usable for files.</p>
+    </div>
+
+    <h2 class="section-title">Run it from a folder</h2>
+    <p>If you want microphone access without deploying the site, serve the folder locally:</p>
+    <pre><code>python3 -m http.server 8000
+# then open http://localhost:8000/app/</code></pre>
+    <p>The standalone file can also be served this way; capture works from <code>localhost</code>.</p>
+
+    <h2>Why offer a single file?</h2>
+    <p>Because “local” should survive the website. A single file is easy to inspect, easy to keep, and cannot phone home even if someone wanted it to. The code in it is the same code the hosted page runs.</p>
+
+    <div class="cta-box">
+      <div>
+        <strong>Prefer the hosted version?</strong>
+        <p>It adds deep links, saved preferences and the guides.</p>
+      </div>
+      <a class="btn btn-secondary" href="/app/">Open the workbench</a>
+    </div>
+  </div>
+</main>
+<!-- SITE:FOOTER -->
+</body>
+</html>

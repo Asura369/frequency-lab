@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page">
+<!-- SITE:NAV -->
+<main id="main">
+  <article class="prose">
+    <p class="eyebrow">Guide · 5 min read</p>
+    <h1>Finding 50/60 Hz mains hum in a recording</h1>
+    <p class="lede">Mains hum is one of the few “bad frequencies” you can diagnose visually: a stack of perfectly spaced lines that never goes away. Here is how to spot it and what it means.</p>
+
+    <h2>What it looks like</h2>
+    <p>Hum is not a single tone. It is a fundamental at the local grid frequency — 60 Hz in North America, 50 Hz in most of Europe and Asia — plus harmonics at 120/180/240 Hz or 100/150/200 Hz. On a spectrogram that reads as a ladder of horizontal lines at exact multiples, present even in quiet passages.</p>
+    <p>Because the lines are evenly spaced and steady, they are easy to distinguish from music. Music moves; hum does not.</p>
+
+    <h2>Check it in three steps</h2>
+    <ol>
+      <li><strong>Open the file.</strong> Use the local file, not a microphone recording of the room, so you are testing the recording rather than the playback chain.</li>
+      <li><strong>Set the target to 60 Hz (or 50 Hz)</strong> with a tolerance of ±1 Hz. The presets page has both.</li>
+      <li><strong>Play a quiet passage.</strong> If the target evidence stays high while nothing else is happening, the hum is in the file. Then look at the spectrogram for lines at 120/180 Hz or 100/150 Hz to confirm the harmonic ladder.</li>
+    </ol>
+
+    <h2>Where hum comes from</h2>
+    <ul>
+      <li><strong>Ground loops.</strong> Two devices on different earth paths; the classic buzz that changes when you touch a cable.</li>
+      <li><strong>Unbalanced cables near power.</strong> Instrument cables running parallel to mains leads pick up the field.</li>
+      <li><strong>Dimmers, chargers and appliances.</strong> These add harmonics and can make the hum sound harsher.</li>
+      <li><strong>Microphone or interface electronics.</strong> Some preamps hum audibly at high gain even with nothing connected.</li>
+      <li><strong>Recording a room.</strong> A fridge, a transformer or a dimmer in the room can be captured by the microphone.</li>
+    </ul>
+
+    <h2>Recording or playback?</h2>
+    <p>If the file is clean but the microphone path shows hum, the problem is in your room or your capture chain. If the file itself shows hum, the problem was baked in when it was recorded and no amount of playback tweaking will remove it. Analysing a file directly is the fastest way to tell the two apart.</p>
+
+    <h2>What to do about it</h2>
+    <p>The workbench measures; it does not repair. Practical fixes, in rough order of effort: move signal cables away from power, use one outlet for the whole chain, try a ground-loop isolator or a DI box, and disable dimmers. In a DAW, a narrow notch at the fundamental and its harmonics can reduce hum, at the cost of a little signal around those frequencies.</p>
+
+    <h2>A musical complication</h2>
+    <p>50 Hz is close to G1 (49 Hz) and 60 Hz is near B♭1 (58.3 Hz). A bass note can land near the hum line without being hum. The tell is the harmonic pattern and the steadiness: hum keeps a rigid ladder even in silence, while a bass note comes and goes with the music.</p>
+
+    <div class="callout">
+      <p><strong>Quick check.</strong> <a href="/app/?t=60&amp;tol=1">Open at 60 Hz ±1</a> or <a href="/app/?t=50&amp;tol=1">50 Hz ±1</a>, then play the quietest ten seconds of the file.</p>
+    </div>
+
+    <div class="cta-box">
+      <div>
+        <strong>Chasing a buzz in your setup?</strong>
+        <p>Measure the file first, then the microphone path, and compare. The difference tells you where the hum enters.</p>
+      </div>
+      <a class="btn btn-primary" href="/app/?t=60&amp;tol=1">Open at 60 Hz</a>
+    </div>
+
+    <p><a href="/guides/">← All guides</a></p>
+  </article>
+</main>
+<!-- SITE:FOOTER -->
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page">
+<!-- SITE:NAV -->
+<main id="main">
+  <article class="prose">
+    <p class="eyebrow">Guide · 6 min read</p>
+    <h1>How to verify 432 Hz vs 440 Hz</h1>
+    <p class="lede">The difference is 31.8 cents — about a third of a semitone. It is measurable. What it means for how music feels is a different question, and not one a spectrum can answer.</p>
+
+    <h2>What the numbers mean</h2>
+    <p>Concert pitch fixes A4 at 440 Hz. “432 tuning” moves that reference down by 8 Hz. In cents — the logarithmic unit musicians use — the shift is <code>1200 · log₂(432 / 440) ≈ −31.8 cents</code>. Every note in a retuned piece moves with the reference; it is not a single note dropped by 8 Hz.</p>
+    <p>This is why a note reader is useful: at 432 Hz the tool shows A4 −31.8 cents, not “A4, 8 Hz flat”. The cents value is the honest description of a tuning difference.</p>
+
+    <h2>A procedure that produces a real answer</h2>
+    <ol>
+      <li><strong>Pick a sustained section.</strong> A pad, a drone, a held note or a reference tone. Skip drum fills and modulation.</li>
+      <li><strong>Set the target to 432 Hz</strong> with a tolerance of ±1 or ±2 Hz. The preset opens this for you.</li>
+      <li><strong>Play and watch the evidence</strong> for at least ten seconds. “Consistent” means a tone-like peak was in that band whenever there was signal.</li>
+      <li><strong>Read the peak table.</strong> If the track is tuned to 432, the strongest sustained line should sit at 432 (or its harmonics at 864, 1296 …), not 440.</li>
+      <li><strong>Repeat at 440 Hz.</strong> A properly retuned track should favour 432 and not 440. If both are strong, you may be looking at a chord, a layer, or a mix of sources.</li>
+    </ol>
+
+    <h2>What can go wrong</h2>
+    <ul>
+      <li><strong>Vibrato and glides.</strong> A voice or string section moves by more than 8 Hz regularly. Use a steady passage, or accept “intermittent” as the correct verdict.</li>
+      <li><strong>Chords.</strong> A chord contains many notes; none of them has to be A4. Test a single note or a drone, not a full harmony.</li>
+      <li><strong>Resampling and transcoding.</strong> A 432 Hz file converted and re-encoded is still 432 Hz; platforms do not usually retune. But a speed change of 0.1% moves a note by about 1.7 cents, so check the source version.</li>
+      <li><strong>A 432 Hz layer over 440 Hz music.</strong> Some “432 Hz” uploads are ordinary tracks with a quiet 432 Hz sine added. The tone is measurable; the claim that the music was retuned is not supported by it.</li>
+      <li><strong>Speaker and room resonances.</strong> A room mode near 432 Hz can make that band look strong even when the source is not tuned there. Move the microphone or use a file, where the room is out of the loop.</li>
+    </ul>
+
+    <h2>What a good result looks like</h2>
+    <p>A retuned reference tone gives a peak within a fraction of a hertz of 432, a clean note reading of A4 −31.8 cents, and a target verdict above 80% while the tone is playing. A retuned piece of music gives the same evidence during sustained passages, diluted by everything else that is happening.</p>
+    <p>Neither result says anything about relaxation, health or “natural” tuning. Those claims need controlled listening studies, not a spectrum. The tool is careful to stop at the acoustic fact.</p>
+
+    <div class="callout">
+      <p><strong>Shortcut.</strong> <a href="/app/?t=432&amp;tol=1">Open the workbench at 432 Hz ±1</a>, drop the file, and play a steady section.</p>
+    </div>
+
+    <div class="cta-box">
+      <div>
+        <strong>Comparing two versions?</strong>
+        <p>Run each file separately at 432 and 440 and compare the evidence percentages.</p>
+      </div>
+      <a class="btn btn-primary" href="/app/?t=432&amp;tol=1">Open at 432 Hz</a>
+    </div>
+
+    <p><a href="/guides/">← All guides</a></p>
+  </article>
+</main>
+<!-- SITE:FOOTER -->
+</body>
+</html>

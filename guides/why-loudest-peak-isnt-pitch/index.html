@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- SITE:HEAD -->
+<link rel="stylesheet" href="/src/styles/site.css">
+</head>
+<body class="page">
+<!-- SITE:NAV -->
+<main id="main">
+  <article class="prose">
+    <p class="eyebrow">Guide · 7 min read</p>
+    <h1>Why the loudest frequency is not the pitch</h1>
+    <p class="lede">A spectrum shows which partials are loud. Pitch is what your brain infers from their pattern. Confusing the two is the most common way a frequency reading misleads you.</p>
+
+    <h2>A note is a family, not a number</h2>
+    <p>Play a bass note at 82.4 Hz — the low E of a guitar — and the spectrum does not show one line at 82.4 Hz. It shows a series: 82.4, 164.8, 247.2, 329.6 and so on. Those are the fundamental and its harmonics. On many instruments the second or third harmonic is louder than the fundamental, because the body and the pickup emphasise it.</p>
+    <p>The workbench reports the <em>strongest peak</em>. If the second harmonic wins, the headline number reads 164.8 Hz and the note line says E3 — an octave above the note being played. Nothing is broken. The measurement is correct; the interpretation “that is the pitch” is wrong.</p>
+
+    <h2>Chords have no single pitch</h2>
+    <p>A major triad contains three fundamentals and, in practice, dozens of harmonics. There is no single frequency that is “the” pitch of the chord. A peak meter will pick whichever partial is momentarily loudest and jump between them. That is why the tool labels its list “strongest peaks” and why the disclaimer says a peak is not musical pitch.</p>
+    <p>The same applies to a full mix: the loudest partial might belong to the bass, the vocal, a cymbal or a resonance in the room.</p>
+
+    <h2>Time smears the answer</h2>
+    <p>The analysis window is about 0.68 s at 48 kHz. Any note shorter than that is averaged into its neighbours. A fast run, a drum hit or a trill does not produce a clean peak — it produces a broad smear. The spectrogram is the honest view for anything rhythmic; the readout is best for sustained tones.</p>
+
+    <h2>The missing fundamental</h2>
+    <p>Sometimes the fundamental is genuinely absent — a small speaker cannot reproduce 41 Hz, or a mix high-passes the bass — yet you still hear the low note. Your auditory system reconstructs it from the spacing of the harmonics. A spectrum shows what is present, not what you perceive. If you need to prove a low tone exists, look for the harmonic series, not just its first member.</p>
+
+    <h2>How to read the peak table instead</h2>
+    <p>Use the relationship between peaks, not just the top one:</p>
+    <ul>
+      <li><strong>Evenly spaced peaks</strong> suggest one source and its harmonics. The spacing is the fundamental, even when it is not the loudest line.</li>
+      <li><strong>Unrelated peaks</strong> suggest different sources — or a chord.</li>
+      <li><strong>Salience matters.</strong> A peak only 2 dB above its neighbours may be noise; the table’s <em>Prom</em> column shows the margin over the sidebands.</li>
+      <li><strong>Check the low end first.</strong> If a 55 Hz line exists under 110 and 165, the note is probably A1, not A2.</li>
+    </ul>
+
+    <h2>When the number is trustworthy</h2>
+    <p>For a steady sine or a well-isolated sustained note, the dominant peak is exactly what you want, and the readout is precise. For everything else, treat the headline as “the loudest partial right now” and read the peak table and the spectrogram together. If you are verifying a specific tone, use the target panel: it asks whether energy exists in a band, which is a narrower and more honest question than “what is the frequency of this music?”.</p>
+
+    <div class="callout">
+      <p><strong>Rule of thumb.</strong> A spectrum peak is a fact about a window of samples. A pitch is a conclusion your brain draws. The tool reports the first and refuses to pretend it is the second.</p>
+    </div>
+
+    <div class="cta-box">
+      <div>
+        <strong>See it for yourself.</strong>
+        <p>Run the self-test, then load a track and compare the headline with the peak table.</p>
+      </div>
+      <a class="btn btn-primary" href="/app/">Open the lab</a>
+    </div>
+
+    <p><a href="/guides/">← All guides</a></p>
+  </article>
+</main>
+<!-- SITE:FOOTER -->
+</body>
+</html>

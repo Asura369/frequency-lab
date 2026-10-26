@@ -1,60 +1,110 @@
 # Frequency Lab
 
-A single-file, local-only frequency detector for music and video. Point it at a
-microphone, a browser tab, or an audio/video file and it shows the dominant
-frequency, the nearest musical note and cents offset, a log-scale spectrum, a
-live spectrogram, and a verdict on whether a chosen target frequency is
-actually present.
+A local-first frequency verification workbench for the browser, plus a small
+site around it: methodology, a claims table, six guides and an offline edition.
 
-There is no build step, no tracking, and no network access — everything runs in
-the page.
+**The question it answers:** *is this audio really at frequency X, and how much
+of the time?* Not "what key is this song in" and not "is this frequency good for
+you" — those are different problems, and the tool is explicit about the line.
 
-![Frequency Lab desktop view](freqlab-preview.png)
+![Frequency Lab workbench running a 440 Hz test tone](public/freqlab-preview.png)
 
 ## Run it
 
-Open `frequency-lab.html` directly in Chrome, Edge, or Safari:
-
-- **Open file** works from `file://` (decode and analysis of local media).
-- **Microphone** and **tab audio** need a secure origin, so serve the folder:
-
 ```sh
-python3 -m http.server 8000
-# then open http://localhost:8000/frequency-lab.html
+npm install
+npm run dev          # http://127.0.0.1:5173
 ```
 
-Append `?demo=440` to open with a built-in oscillator, or `?selftest=1` to run
-the internal 440/432/528 Hz self-test.
-
-## What it shows
-
-- Dominant peak, note name, and cents deviation, plus the top peaks above the
-  noise floor.
-- Target verification: SNR and prominence at the target, a percentage across
-  the last 10 s and the whole session, and a verdict
-  (consistent / intermittent / not detected / collecting).
-- Log-frequency spectrum from 20 Hz to 20 kHz, driven by a 32k-point FFT for
-  about 1.46 Hz resolution at 48 kHz.
-- Scrolling spectrogram with a time axis and a 10 s bucket history.
-- CSV export (10 Hz session rows) and PNG capture of both plots.
-
-## Verification
-
-Both scripts use only Node's standard library (the UI test drives a local Chrome
-over CDP and needs Chrome installed at the standard macOS path).
+Production build and preview:
 
 ```sh
-node verify-dsp.mjs   # DSP core extracted from the HTML: 27 checks
-node verify-ui.mjs    # browser smoke test, screenshots, mic/file paths
+npm run build        # static site in dist/ + single-file edition
+npm run preview      # http://127.0.0.1:4173
 ```
 
-`verify-ui.mjs` writes `freqlab-preview.png` and `freqlab-preview-mobile.png`.
+Microphone and tab capture need a secure context. `localhost` qualifies; opening
+`dist/index.html` as a file does not. The standalone edition in
+`dist/download/frequency-lab.html` is the exception: file analysis, exports and
+the self-test work from `file://`, while capture shows a clear notice.
 
-## Files
+## What is in the box
 
-| File | Purpose |
+| Path | Purpose |
 | --- | --- |
-| `frequency-lab.html` | The whole app: markup, styles, DSP, rendering |
-| `verify-dsp.mjs` | Headless checks of the embedded DSP core |
-| `verify-ui.mjs` | Chrome/CDP smoke test across mic, tab, file, export |
-| `freqlab-preview*.png` | Reference screenshots of the desktop and mobile views |
+| `index.html` | Landing page with a permission-free tone demo |
+| `app/` | Workbench markup (the shared view lives in `src/app/view.html`) |
+| `guides/` | Six articles, generated nav/metadata, hand-written prose |
+| `presets/` | Claims table generated from `src/site/presets.ts` |
+| `how-it-works/` | FFT, evidence and limits |
+| `offline/`, `privacy/`, `404.html` | Offline edition, privacy, not found |
+| `src/dsp/core.ts` | Pure measurement core, shared by app, demo and tests |
+| `src/app/` | Workbench state, session lifecycle, rendering, UI |
+| `src/site/` | Routes, chrome, presets, service-worker registration |
+| `scripts/` | Build glue, link check, icons, screenshots |
+| `test/` | Vitest unit tests |
+| `e2e/` | Playwright suite |
+
+The measurement core was extracted verbatim from the original single-file build
+and is frozen by `test/dsp.test.ts` (27 assertions). The rest of the workbench
+was ported without behaviour changes.
+
+## Measurement, briefly
+
+- 32,768-point FFT for the fine spectrum: ~1.46 Hz per bin at 48 kHz, ~0.68 s
+  window. 8,192-point FFT for the spectrogram.
+- Peak picking above a median noise floor, with salience and parabolic
+  interpolation; the headline is the strongest peak, not a pitch estimate.
+- Target evidence is counted over 100 ms buckets and ignores silence; 80% /
+  20% thresholds separate consistent, intermittent and not-detected.
+- dB values are relative to full scale, not calibrated SPL.
+
+The full method, including what it cannot tell you, is in
+[`how-it-works/index.html`](how-it-works/index.html).
+
+## Tests
+
+```sh
+npm test             # Vitest: DSP core + URL/preset logic
+npm run test:e2e     # Playwright: site, workbench, exports, mic, file, PWA
+npm run typecheck    # tsc --noEmit
+npm run check:links  # internal links + page metadata in dist/
+```
+
+The end-to-end suite drives Chrome with a fake 440 Hz microphone, opens real
+WAV fixtures, exercises CSV/PNG downloads and checks that a corrupt file is
+cleaned up. Visual snapshots are generated on macOS and skipped in CI:
+
+```sh
+npx playwright test e2e/visual.spec.ts --update-snapshots
+node scripts/screenshots.mjs      # refreshes the images in public/
+```
+
+## Deploy
+
+Static output, no server. Cloudflare Pages is the recommended target because it
+builds from a private repository and supports preview deployments; GitHub Pages
+needs a public repository. See [DEPLOY.md](DEPLOY.md).
+
+Set `SITE_URL` at build time to the production origin. It is used for canonical
+links, Open Graph, `sitemap.xml` and `robots.txt`.
+
+## Privacy
+
+Audio never leaves the browser: no uploads, no accounts, no cookies, no
+third-party scripts. Preferences (target, tolerance, palette) are kept in
+`localStorage`; nothing else persists. The service worker caches interface files
+for offline use and contains no audio. See `/privacy/`.
+
+## Status
+
+Shipped: live verification workbench, whole-site content, PWA, offline edition,
+shareable setup links, deep-linkable presets, contrast palette, keyboard
+shortcuts, CI and link checks.
+
+Next milestones (not built yet): faster-than-real-time whole-file analysis with
+a zoomable timeline and band-energy mix; chroma/key estimation with a
+configurable A4 reference; multiple simultaneous targets; report links.
+
+There is no license file yet; the repository is private and the code is not
+published for reuse.
