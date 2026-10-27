@@ -1,65 +1,114 @@
 # Deploying Frequency Lab
 
-The site is plain static output: `npm run build` writes `dist/`. Any static host
-works; the instructions below use Cloudflare Pages because it can build from a
-private repository, gives preview URLs per pull request, and honours the
-`_headers` / `_redirects` files in `public/`.
+The site is static output: `npm run build` writes `dist/`. This deployment uses
+**Cloudflare Workers with static assets**, built from the private GitHub
+repository by Workers Builds. The repository ships `wrangler.toml`, which is
+what controls routing (including the 404 page) and the asset directory.
 
-## 1. Push the repository
+A custom domain is optional. The `workers.dev` hostname is HTTPS-enabled, serves
+the PWA and works with search engines; you can add a domain later, at the cost
+of resetting installed PWAs and caches for the old origin.
 
-The repository can stay private. Create it on GitHub and push `main`:
+## 1. Build settings (one-time)
 
-```sh
-git remote add origin git@github.com:<you>/frequency-lab.git
-git push -u origin main
+Cloudflare dashboard → **Workers & Pages** → your Worker → **Settings → Build**.
+
+| Setting | Value |
+| --- | --- |
+| Root directory | `/` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Node version | 22 (`NODE_VERSION=22` if the default differs) |
+
+Environment variable (build time, **not** runtime):
+
+```text
+SITE_URL = https://frequency-lab.endless9.workers.dev
 ```
 
-## 2. Create the Cloudflare Pages project
+`SITE_URL` is read by `src/site/routes.ts` during the build and written into
+canonical tags, Open Graph, `sitemap.xml` and `robots.txt`. Without it the build
+falls back to `https://frequencylab.example`.
 
-1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Install the Cloudflare GitHub app for the repository.
-3. Build settings:
-   - **Framework preset:** None
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-   - **Node version:** 22 (set `NODE_VERSION=22` as an environment variable if the default differs)
-4. Environment variable: `SITE_URL` = `https://<your-domain>` (no trailing slash).
-   This is used for canonical URLs, Open Graph tags, the sitemap and `robots.txt`.
-   Without it the build falls back to `https://frequencylab.example`.
-5. Deploy. Every branch and pull request gets a preview URL.
+Do not put `SITE_URL` in `[vars]` in `wrangler.toml`; that is a runtime variable
+and will not affect the build.
 
-## 3. Attach the domain
+## 2. What `wrangler.toml` controls
 
-1. Pages project → **Custom domains** → add the apex and/or `www`.
-2. Follow the DNS instructions. Cloudflare terminates TLS; enable **Always Use HTTPS**.
-3. Re-deploy after adding the domain so `SITE_URL` matches the canonical host.
+```toml
+name = "frequency-lab"
+compatibility_date = "2026-10-26"
 
-## 4. What is deployed
-
-- `/` landing page, `/app/` workbench, `/guides/` and six articles, `/presets/`,
-  `/how-it-works/`, `/offline/`, `/privacy/`, `/404.html`.
-- `sitemap.xml` and `robots.txt` are generated at build time from the route
-  manifest (`src/site/routes.ts`).
-- `_headers` sets CSP, Permissions-Policy, cross-origin policy and cache rules.
-- `_redirects` keeps old links (`/frequency-lab.html` → `/app/`) working.
-- `sw.js` and `manifest.webmanifest` make the workbench installable and offline.
-- `/download/frequency-lab.html` is the single-file offline edition.
-
-## 5. Post-deploy checks
-
-```sh
-curl -sI https://<domain>/app/ | grep -i content-security-policy
-curl -s https://<domain>/sitemap.xml | head
+[assets]
+directory = "./dist"
+not_found_handling = "404-page"
 ```
 
-Then in a browser:
+- `assets.directory` tells Wrangler to upload `dist/` as static assets.
+- `not_found_handling = "404-page"` serves the nearest `404.html` with status
+  **404** for unknown paths. This is **not** a dashboard toggle; it lives in the
+  Wrangler config file.
+- `_headers` and `_redirects` in `public/` are copied into `dist/` and applied
+  by Workers static assets.
 
-1. Run the self-test on `/app/`.
-2. Reload once, stop the network, reload again: the workbench should still load.
-3. Open `/offline/`, download the file, open it from disk with no network.
-4. Check the console for CSP violations; there should be none.
+If the dashboard deploy command already passes `--assets ./dist`, remove that
+flag and let `wrangler.toml` provide the configuration, otherwise the 404
+setting can be bypassed.
 
-## Rollback
+## 3. Deploy
 
-Pages keeps every deployment. Use **Deployments → … → Rollback** to return to a
-previous build; no database or server state is involved.
+Push to `main`; Workers Builds rebuilds and deploys the Worker.
+
+```sh
+git push
+```
+
+Manual deploy:
+
+```sh
+SITE_URL=https://frequency-lab.endless9.workers.dev npm run build
+npx wrangler deploy
+```
+
+## 4. Verify production
+
+```sh
+# 404 page and status
+curl -s -o /dev/null -w '%{http_code}\n' https://<host>/nope/        # 404
+curl -s https://<host>/nope/ | grep -o '<title>[^<]*</title>'
+
+# canonical and sitemap match SITE_URL
+curl -s https://<host>/ | grep -o '<link rel="canonical"[^>]*>'
+curl -s https://<host>/sitemap.xml | head -4
+
+# headers and redirects
+curl -sI https://<host>/app/ | grep -iE 'content-security-policy|permissions-policy'
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://<host>/frequency-lab.html
+```
+
+In a browser: run the self-test (it is audible now), check the in-band peak line
+on a request, reload with the network off, and open the downloaded
+`/download/frequency-lab.html` from disk.
+
+## 5. Custom domain (optional)
+
+1. Buy or delegate a domain to Cloudflare.
+2. Worker → **Settings → Domains & Routes** → **Add custom domain**.
+3. Change `SITE_URL` to the new origin, then redeploy.
+4. Keep the old `workers.dev` URL working; it is not redirected automatically.
+   Add a redirect Worker/route if you want one canonical host.
+
+Changing the origin resets service-worker caches and installed PWAs, so do it
+before you promote the site widely.
+
+## 6. Rollback
+
+Worker → **Deployments** → choose a previous version → **Rollback**. Static
+assets and the Worker version move together; there is no database or server
+state to restore.
+
+## Alternative: Cloudflare Pages
+
+Pages also works: build `npm run build`, output `dist`, set `SITE_URL`, and add
+a `404.html`. Pages reads `_headers` / `_redirects` too, but Workers Builds is
+what this repository is configured for.

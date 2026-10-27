@@ -1,0 +1,9 @@
+name = "frequency-lab"
+compatibility_date = "2026-10-26"
+
+# Static assets are built by `npm run build` into dist/.
+# 404-page makes unknown paths serve the nearest 404.html with status 404
+# instead of falling back to the landing page (soft 404).
+[assets]
+directory = "./dist"
+not_found_handling = "404-page"

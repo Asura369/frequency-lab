@@ -82,9 +82,9 @@ node scripts/screenshots.mjs      # refreshes the images in public/
 
 ## Deploy
 
-Static output, no server. Cloudflare Pages is the recommended target because it
-builds from a private repository and supports preview deployments; GitHub Pages
-needs a public repository. See [DEPLOY.md](DEPLOY.md).
+Static output, no server. The deployment uses Cloudflare Workers with static
+assets, built from the private GitHub repository by Workers Builds; `wrangler.toml`
+sets the asset directory and the 404 behaviour. See [DEPLOY.md](DEPLOY.md).
 
 Set `SITE_URL` at build time to the production origin. It is used for canonical
 links, Open Graph, `sitemap.xml` and `robots.txt`.
