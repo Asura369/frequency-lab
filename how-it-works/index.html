@@ -44,6 +44,7 @@
       <li>A frame counts as <em>tone present</em> when band SNR ≥ 6 dB <em>and</em> prominence ≥ 6 dB.</li>
     </ul>
     <p>Frames are grouped into 100 ms buckets. A bucket counts as present when at least half of its signal frames detect a tone. The percentages ignore silent buckets, so they answer “when there was signal, how often was the target there?” — not “how often was there sound?”.</p>
+    <p>Presence is not dominance. The target can be a quiet layer under a much louder peak — the card reports the strongest peak separately, plus how far the in-band target peak sits below it. A green verdict means the target exists, not that it is the loudest thing in the audio.</p>
     <p>The verdict uses the session percentage: 80% or more is <strong>consistent</strong>, 20–80% is <strong>intermittent</strong>, below 20% is <strong>not detected</strong>. With fewer than ten signal buckets it reports <strong>collecting</strong> instead of guessing.</p>
 
     <h2>The signal gate</h2>

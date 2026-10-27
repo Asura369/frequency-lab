@@ -161,6 +161,7 @@ function resetReadout() {
   els.snr.textContent = '—';
   els.pct10.textContent = '—';
   els.pctAll.textContent = '—';
+  els.targetMeta.textContent = '';
   els.snrBar.style.width = '0%';
   els.snrBar.style.background = 'var(--trace)';
   els.peakRows.replaceChildren();
@@ -236,6 +237,16 @@ function updateReadouts() {
   els.pct10.textContent = formatPercent(windowSummary.percent);
   els.pctAll.textContent = formatPercent(sessionPercent);
 
+  if (evidence && evidence.valid && Number.isFinite(evidence.peakHz) && state.peaks.length) {
+    const dominant = state.peaks[0];
+    const same = Math.abs(dominant.hz - evidence.peakHz) < 0.75;
+    els.targetMeta.textContent = same
+      ? `In-band peak ${evidence.peakHz.toFixed(1)} Hz · strongest peak`
+      : `In-band peak ${evidence.peakHz.toFixed(1)} Hz · ${(dominant.db - (evidence.peakDb ?? dominant.db)).toFixed(0)} dB below the strongest peak (${dominant.hz.toFixed(1)} Hz)`;
+  } else {
+    els.targetMeta.textContent = '';
+  }
+
   if (!state.targetValid) {
     setVerdict('set target', 'warn');
     const maxTarget = state.ctx
@@ -262,14 +273,14 @@ function updateReadouts() {
     els.verdictText.textContent = `Collecting evidence for ${targetLabel} — about a second of signal is needed.`;
   } else if (verdict === 'consistent') {
     setVerdict('consistent', 'pass');
-    els.verdictText.textContent = `${targetLabel} is present in ${formatPercent(windowSummary.percent)} of signal time in the last 10 seconds.`;
+    els.verdictText.textContent = `A tone-like peak sits in ${targetLabel} for ${formatPercent(windowSummary.percent)} of signal time in the last 10 seconds.`;
   } else if (verdict === 'intermittent') {
     setVerdict('intermittent', 'warn');
-    els.verdictText.textContent = `${targetLabel} appears intermittently: ${formatPercent(windowSummary.percent)} of signal time in the last 10 seconds.`;
+    els.verdictText.textContent = `A tone-like peak appears intermittently in ${targetLabel}: ${formatPercent(windowSummary.percent)} of signal time in the last 10 seconds.`;
   } else {
     setVerdict('not detected', 'fail');
     const snrText = evidence ? ` Band energy is ${formatSnr(evidence.snrDb)} over the floor.` : '';
-    els.verdictText.textContent = `${targetLabel} is not present in the last 10 seconds.${snrText}`;
+    els.verdictText.textContent = `No tone-like peak in ${targetLabel} over the last 10 seconds.${snrText}`;
   }
 }
 
@@ -1197,7 +1208,7 @@ async function startTone(frequency) {
   const seq = state.seq;
   setStatus(`Starting ${tone.toFixed(1)} Hz test tone…`);
   try {
-    const ok = await boot(seq, { mode: 'test', toneFreq: tone, gain: 0 });
+    const ok = await boot(seq, { mode: 'test', toneFreq: tone, gain: 0.2 });
     if (!ok) return false;
   } catch (error) {
     if (seq === state.seq) {
@@ -1206,7 +1217,7 @@ async function startTone(frequency) {
     }
     return false;
   }
-  setStatus(`Test tone ${tone.toFixed(2)} Hz (silent).`);
+  setStatus(`Test tone ${tone.toFixed(2)} Hz — playing quietly.`);
   return true;
 }
 

@@ -232,6 +232,11 @@
     font-family: var(--mono); font-size: 15px; font-weight: 500;
     font-variant-numeric: tabular-nums; color: var(--ink);
   }
+  .target-meta {
+    margin: 0 0 8px; min-height: 14px; color: var(--faint);
+    font-family: var(--mono); font-size: 10px; line-height: 1.4;
+  }
+  .target-meta:empty { display: none; }
   .bar { height: 4px; border-radius: 2px; background: #131a22; overflow: hidden; margin: 10px 0 12px; }
   .bar > div { height: 100%; width: 0%; background: var(--trace); transition: width .15s linear, background .2s ease; }
   .verdict-text {

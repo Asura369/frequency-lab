@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
-import { writeToneWav } from './audio';
+import { writeMixWav, writeToneWav } from './audio';
 import { canvasHasInk, selfTest, startDemo, watchErrors } from './helpers';
 
 const TMP = path.resolve('.tmp');
@@ -77,6 +77,49 @@ test.describe('workbench', () => {
     await expect(page.locator('#pauseBtn')).toHaveText('Pause');
     await page.keyboard.press('s');
     await expect(page.locator('#status')).toContainText('Stopped');
+  });
+
+  test('the diagnostics test tone is audible', async ({ page }) => {
+    await page.goto('/app/');
+    await page.evaluate(() => (document.getElementById('toneBtn') as HTMLButtonElement).click());
+    await page.waitForFunction(() => window.__freqLab.state.running, null, { timeout: 15_000 });
+    const gain = await page.evaluate(() => window.__freqLab.state.outGain?.gain.value ?? 0);
+    expect(gain).toBeGreaterThan(0.05);
+    await expect(page.locator('#status')).toContainText('playing quietly');
+    await page.locator('#stopBtn').click();
+  });
+
+  test('the target card separates presence from dominance', async ({ page }) => {
+    const wav = path.join(TMP, 'mix-963-639-396.wav');
+    writeMixWav(
+      wav,
+      [
+        { hz: 963.5, amp: 0.34 },
+        { hz: 639.9, amp: 0.17 },
+        { hz: 396.3, amp: 0.05 },
+      ],
+      5
+    );
+    await page.goto('/app/?t=396&tol=3');
+    await page.setInputFiles('#fileInput', wav);
+    await page.waitForFunction(() => window.__freqLab.state.displayHz != null, null, {
+      timeout: 20_000,
+    });
+    await page.waitForFunction(
+      () => {
+        const meta = document.getElementById('targetMeta')?.textContent || '';
+        return meta.includes('396') && meta.includes('below the strongest peak');
+      },
+      null,
+      { timeout: 20_000 }
+    );
+    const meta = (await page.locator('#targetMeta').textContent()) || '';
+    expect(meta).toContain('396');
+    expect(meta).toMatch(/9[0-9]{2}\.[0-9]/);
+    await expect(page.locator('#verdictText')).toContainText('tone-like peak');
+    const dominant = Number.parseFloat((await page.locator('#freq').textContent()) || '0');
+    expect(dominant).toBeGreaterThan(900);
+    await page.locator('#stopBtn').click();
   });
 
   test('microphone path measures the fake 440 Hz device', async ({ page }) => {

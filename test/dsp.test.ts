@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { expect, test } from 'vitest';
 import { FreqLabDSP as DSP } from '../src/dsp/core';
 
 let passes = 0;
@@ -295,4 +295,34 @@ test('verdictFor thresholds', () => {
   equal(DSP.verdictFor(5, 40), 'not-detected');
   equal(DSP.verdictFor(null, 0), 'no-signal');
   equal(DSP.verdictFor(100, 4), 'collecting');
+});
+
+test('a quiet target is present while another peak dominates', () => {
+  const sr = 48000;
+  const fft = 32768;
+  const binHz = sr / fft;
+  const db = new Float32Array(fft / 2).fill(-100);
+  const paint = (hz: number, level: number) => {
+    const bin = Math.round(hz / binHz);
+    db[bin - 1] = level - 12;
+    db[bin] = level;
+    db[bin + 1] = level - 12;
+  };
+  paint(963.5, -30);
+  paint(639.9, -50);
+  paint(396.3, -70);
+
+  const peaks = DSP.pickPeaks(db, { sampleRate: sr, fftSize: fft, floorDb: -100 });
+  expect(peaks[0].hz).toBeCloseTo(963.5, 0);
+
+  const evidence = DSP.targetEvidence(db, {
+    sampleRate: sr,
+    fftSize: fft,
+    targetHz: 396,
+    tolHz: 3,
+    floorDb: -100,
+  });
+  expect(evidence.valid).toBe(true);
+  expect(evidence.tonePresent).toBe(true);
+  expect(peaks[0].db - (evidence.peakDb ?? 0)).toBeGreaterThan(30);
 });

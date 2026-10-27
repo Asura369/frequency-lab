@@ -31,6 +31,7 @@ export const els = {
   pctAll: $('pctAll'),
   snrBar: $('snrBar'),
   verdictText: $('verdictText'),
+  targetMeta: $('targetMeta'),
   peakRows: $('peakRows'),
   exportCsv: $<HTMLButtonElement>('exportCsv'),
   exportPng: $<HTMLButtonElement>('exportPng'),

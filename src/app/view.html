@@ -88,6 +88,7 @@
           <div class="metric"><span>Session</span><strong id="pctAll">—</strong></div>
         </div>
 
+        <p class="target-meta" id="targetMeta"></p>
         <div class="bar" aria-hidden="true"><div id="snrBar"></div></div>
         <p class="verdict-text" id="verdictText">Start a source, then check whether its energy actually sits at the target frequency.</p>
       </section>
@@ -129,7 +130,7 @@
       </label>
       <button id="toneBtn" class="small" type="button">Start tone</button>
       <button id="selfTestBtn" class="small" type="button">Run self-test</button>
-      <span class="diag-note" id="diagMeta">The self-test uses an internal oscillator; no microphone permission needed.</span>
+      <span class="diag-note" id="diagMeta">The self-test plays short audible tones from an internal oscillator; no microphone permission needed.</span>
       <span class="shortcuts">Keys: <kbd>P</kbd> pause · <kbd>S</kbd> stop · <kbd>E</kbd> export CSV</span>
       <div class="test-result" id="selfTestOut"></div>
     </div>
