@@ -7,6 +7,10 @@ site around it: methodology, a claims table, six guides and an offline edition.
 of the time?* Not "what key is this song in" and not "is this frequency good for
 you" — those are different problems, and the tool is explicit about the line.
 
+Two modes: a live workbench for microphone, tab audio and file playback, and a
+whole-file report that decodes a track or video and analyses it faster than real
+time (spectrogram, target percentage, band energy, sections, recurring peaks).
+
 ![Frequency Lab workbench running a 440 Hz test tone](public/freqlab-preview.png)
 
 ## Run it
@@ -40,13 +44,15 @@ the self-test work from `file://`, while capture shows a clear notice.
 | `offline/`, `privacy/`, `404.html` | Offline edition, privacy, not found |
 | `src/dsp/core.ts` | Pure measurement core, shared by app, demo and tests |
 | `src/app/` | Workbench state, session lifecycle, rendering, UI |
+| `src/app/offline/` | Whole-file FFT, analysis and report aggregation |
+| `src/workers/` | Inlined analysis worker |
 | `src/site/` | Routes, chrome, presets, service-worker registration |
 | `scripts/` | Build glue, link check, icons, screenshots |
 | `test/` | Vitest unit tests |
 | `e2e/` | Playwright suite |
 
 The measurement core was extracted verbatim from the original single-file build
-and is frozen by `test/dsp.test.ts` (27 assertions). The rest of the workbench
+and is frozen by `test/dsp.test.ts` (28 assertions). The rest of the workbench
 was ported without behaviour changes.
 
 ## Measurement, briefly
@@ -57,6 +63,9 @@ was ported without behaviour changes.
   interpolation; the headline is the strongest peak, not a pitch estimate.
 - Target evidence is counted over 100 ms buckets and ignores silence; 80% /
   20% thresholds separate consistent, intermittent and not-detected.
+- Whole-file analysis uses a 16,384-point FFT in a worker (1.46 Hz at 48 kHz),
+  capped at 4,000 frames, 10 minutes and 200 MB; it reports the same evidence
+  over the whole file plus band energy and a full-file spectrogram.
 - dB values are relative to full scale, not calibrated SPL.
 
 The full method, including what it cannot tell you, is in
@@ -98,13 +107,12 @@ for offline use and contains no audio. See `/privacy/`.
 
 ## Status
 
-Shipped: live verification workbench, whole-site content, PWA, offline edition,
-shareable setup links, deep-linkable presets, contrast palette, keyboard
-shortcuts, CI and link checks.
+Shipped: live verification workbench, whole-file analysis and report exports,
+site content, PWA, offline edition, shareable setup links, deep-linkable
+presets, contrast palette, keyboard shortcuts, CI and link checks.
 
-Next milestones (not built yet): faster-than-real-time whole-file analysis with
-a zoomable timeline and band-energy mix; chroma/key estimation with a
-configurable A4 reference; multiple simultaneous targets; report links.
+Next milestones: chroma/key estimation with a configurable A4 reference, a note
+timeline, multiple simultaneous targets, and a zoomable report timeline.
 
 There is no license file yet; the repository is private and the code is not
 published for reuse.

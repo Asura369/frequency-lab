@@ -53,6 +53,11 @@
     <h2>The spectrogram</h2>
     <p>The waterfall uses a separate 8,192-sample FFT, one column every 40 ms, 20 Hz–20 kHz on a log axis, and colour mapped from −100 to −30 dB. The window shown in the interface is the time span of the visible texture (roughly 20–40 s depending on width). Pausing freezes the columns; the analysis and audio keep running.</p>
 
+    <h2>Whole-file analysis</h2>
+    <p>“Analyse file” decodes the whole file with the browser’s decoder, mixes it to mono and runs a 16,384-point FFT in a worker — about 1.46 Hz per bin at 48 kHz and a 0.34 s window. Frames are taken every 2,048 samples for short files and wider hops for long ones, capped at 4,000 frames, so a ten-minute file finishes in seconds rather than real time.</p>
+    <p>Every frame yields the dominant peak, the noise floor and the same target evidence used live. The report adds the share of signal time the target is present, six band-energy shares, ten equal sections, recurring peaks, and a downsampled spectrogram of the whole file. It is exported as JSON, per-frame CSV or a PNG.</p>
+    <p>Limits: 10 minutes or 200 MB per file, mono downmix, no streaming decode and no absolute calibration. The live workbench remains the path for longer files and for microphone or tab capture.</p>
+
     <h2>What it cannot tell you</h2>
     <ul>
       <li><strong>The pitch of a chord or a mix.</strong> A spectrum peak is a partial, not a fundamental. See <a href="/guides/why-loudest-peak-isnt-pitch/">the guide</a>.</li>

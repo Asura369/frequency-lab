@@ -70,7 +70,7 @@ test.describe('workbench', () => {
 
   test('keyboard shortcuts pause and stop', async ({ page }) => {
     await startDemo(page, 440);
-    await page.locator('h2').first().click();
+    await page.locator('#status').click();
     await page.keyboard.press('p');
     await expect(page.locator('#pauseBtn')).toHaveText('Resume');
     await page.keyboard.press('p');
@@ -171,6 +171,64 @@ test.describe('workbench', () => {
     await expect(page.locator('#freq')).toHaveText('—');
     await page.locator('#stopBtn').click().catch(() => undefined);
     await expect(page.locator('#playerWrap')).toBeHidden();
+  });
+
+  test('whole-file analysis renders a report, exports and returns to live', async ({ page }) => {
+    const wav = path.join(TMP, 'whole-file-mix.wav');
+    writeMixWav(
+      wav,
+      [
+        { hz: 963.5, amp: 0.34 },
+        { hz: 639.9, amp: 0.17 },
+        { hz: 396.3, amp: 0.05 },
+      ],
+      6
+    );
+
+    await page.goto('/app/?t=396&tol=3');
+    await page.setInputFiles('#analyseInput', wav);
+    await expect(page.locator('#reportBody')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('#reportPercent')).toHaveText('100');
+    await expect(page.locator('#reportVerdict')).toHaveText('tone present');
+    await expect(page.locator('#reportTargetText')).toContainText('396.0 Hz');
+    await expect(page.locator('#reportSections tr')).toHaveCount(10);
+    await expect(page.locator('#reportPeaks tr')).toHaveCount(3);
+    expect(await canvasHasInk(page, '#reportSpectrogram')).toBe(true);
+
+    const jsonEvent = page.waitForEvent('download');
+    await page.locator('#exportReportJson').click();
+    const jsonDownload = await jsonEvent;
+    expect(jsonDownload.suggestedFilename()).toMatch(/\.json$/);
+    const jsonPath = path.join(TMP, 'report.json');
+    await jsonDownload.saveAs(jsonPath);
+    const payload = JSON.parse((await import('node:fs')).readFileSync(jsonPath, 'utf8'));
+    expect(payload.schema).toBe('freqlab/report@1');
+    expect(payload.target.valid).toBe(true);
+    expect(payload.target.percent).toBeGreaterThan(80);
+    expect(payload.sections).toHaveLength(10);
+    expect(payload.spectrogram).toBeUndefined();
+
+    const csvEvent = page.waitForEvent('download');
+    await page.locator('#exportReportCsv').click();
+    const csvDownload = await csvEvent;
+    expect(csvDownload.suggestedFilename()).toMatch(/\.csv$/);
+
+    await page.locator('#reportClose').click();
+    await expect(page.locator('#reportView')).toBeHidden();
+    await expect(page.locator('.workspace')).toBeVisible();
+    await expect(page.locator('#micBtn')).toBeEnabled();
+    await expect(page.locator('#analyseInput')).toBeEnabled();
+  });
+
+  test('whole-file analysis reports silence without inventing a percentage', async ({ page }) => {
+    const wav = path.join(TMP, 'whole-file-silence.wav');
+    writeToneWav(wav, { frequency: 440, seconds: 2, toneSeconds: 0 });
+    await page.goto('/app/?t=440&tol=3');
+    await page.setInputFiles('#analyseInput', wav);
+    await expect(page.locator('#reportBody')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('#reportPercent')).toHaveText('—');
+    await expect(page.locator('#reportVerdict')).toHaveText('no signal');
+    await expect(page.locator('#reportTargetText')).toContainText('No signal');
   });
 
   test('a corrupt file is rejected and cleaned up', async ({ page }) => {

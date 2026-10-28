@@ -18,6 +18,8 @@ export interface AppState {
   seq: number;
   running: boolean;
   paused: boolean;
+  analysing: boolean;
+  reportOpen: boolean;
   mode: 'mic' | 'tab' | 'file' | 'test' | null;
   ctx: AudioContext | null;
   stream: MediaStream | null;
@@ -65,6 +67,8 @@ export const state: AppState = {
   seq: 0,
   running: false,
   paused: false,
+  analysing: false,
+  reportOpen: false,
   mode: null,
   ctx: null,
   stream: null,

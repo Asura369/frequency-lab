@@ -327,3 +327,99 @@
     #spectrum { height: 130px; }
     #spectrogram { height: 200px; }
   }
+
+  /* whole-file report */
+  .workspace[hidden], .diagnostics[hidden], .report[hidden], .report-progress[hidden],
+  .report-error[hidden] { display: none; }
+  .report { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+  .report-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--line);
+  }
+  .report-top h2 {
+    margin: 6px 0 4px; font-family: var(--display); font-size: 26px;
+    font-weight: 600; letter-spacing: -.02em; color: var(--ink);
+  }
+  .report-meta { margin: 0; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+  .report-progress {
+    padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--panel-2);
+  }
+  .report-progress-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 10px; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+  }
+  .report-progress progress {
+    display: block; width: 100%; height: 8px; appearance: none;
+    border: 0; background: #131a22; border-radius: 4px; overflow: hidden;
+  }
+  .report-progress progress::-webkit-progress-bar { background: #131a22; border-radius: 4px; }
+  .report-progress progress::-webkit-progress-value { background: var(--trace); border-radius: 4px; }
+  .report-progress progress::-moz-progress-bar { background: var(--trace); border-radius: 4px; }
+  .report-error {
+    margin: 0; padding: 12px 14px; border-radius: 8px; font-size: 13px;
+    border: 1px solid rgba(255, 127, 127, .35); background: rgba(255, 127, 127, .06);
+    color: #e8a3a3;
+  }
+  .report-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .report-percent {
+    display: flex; align-items: baseline; gap: 7px; margin-top: 2px;
+    font-family: var(--mono); font-size: 52px; font-weight: 600;
+    letter-spacing: -.04em; line-height: 1; color: var(--ink);
+  }
+  .report-percent .unit { font-size: 13px; font-weight: 400; color: var(--faint); }
+  .report-target-text { margin: 10px 0 0; min-height: 38px; font-size: 13px; color: var(--muted); }
+  .report-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 9px 14px;
+    margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--line);
+  }
+  .report-stats div { display: flex; flex-direction: column; gap: 2px; }
+  .report-stats dt {
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--faint);
+  }
+  .report-stats dd {
+    margin: 0; font-family: var(--mono); font-size: 12px; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .report-bands { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .band-row {
+    display: grid; grid-template-columns: 112px 1fr 42px; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 10.5px; color: var(--muted);
+  }
+  .band-bar { height: 7px; background: #131a22; border-radius: 4px; overflow: hidden; }
+  .band-bar i {
+    display: block; height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--trace), #7fe0ff);
+  }
+  .band-value { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .report-plot canvas {
+    display: block; width: 100%; background: #06090c;
+    border: 1px solid #161e27; border-radius: 8px;
+  }
+  #reportSpectrogram { height: 260px; }
+  #reportTimeline { height: 96px; }
+  .report-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
+  .report-table th {
+    padding: 0 4px 6px; text-align: right; font-weight: 500; font-size: 8.5px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--faint); white-space: nowrap;
+  }
+  .report-table th:first-child, .report-table td:first-child { text-align: left; }
+  .report-table td {
+    padding: 6px 4px; border-top: 1px solid #151d26; text-align: right;
+    color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .report-table td.report-first { color: var(--ink); }
+  .report-table td.empty { text-align: left; color: var(--faint); }
+  .report-actions { margin: 0 0 4px; }
+  .report-audio { display: block; width: 100%; }
+
+  @media (max-width: 900px) {
+    .report-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .report-top { flex-direction: column; }
+    .report-percent { font-size: 42px; }
+    #reportSpectrogram { height: 200px; }
+    .band-row { grid-template-columns: 92px 1fr 38px; }
+  }

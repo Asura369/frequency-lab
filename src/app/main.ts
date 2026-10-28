@@ -6,70 +6,10 @@ import { parseUrlState, syncUrl, clearDemoParam, setupLink } from './url-state';
 import { loadPrefs, savePrefs, type Palette } from './prefs';
 import { copyText, summaryText } from './share';
 import { APP_PRESETS } from '../site/presets';
+import { initOfflineUI } from './offline-ui';
+import { COLOR_LUT, CONTRAST_LUT } from './lut';
 import '../site/register-sw';
 
-function buildColorLut() {
-  const stops: Array<[number, [number, number, number]]> = [
-    [0.00, [7, 10, 15]],
-    [0.18, [43, 33, 120]],
-    [0.40, [42, 157, 143]],
-    [0.64, [184, 222, 41]],
-    [0.84, [255, 196, 80]],
-    [1.00, [255, 243, 176]],
-  ];
-  const lut: Array<[number, number, number]> = new Array(256);
-  for (let i = 0; i < 256; i++) {
-    const t = i / 255;
-    let a = stops[0];
-    let b = stops[stops.length - 1];
-    for (let s = 0; s < stops.length - 1; s++) {
-      if (t >= stops[s][0] && t <= stops[s + 1][0]) {
-        a = stops[s];
-        b = stops[s + 1];
-        break;
-      }
-    }
-    const f = (t - a[0]) / (b[0] - a[0] || 1);
-    lut[i] = [
-      Math.round(a[1][0] + (b[1][0] - a[1][0]) * f),
-      Math.round(a[1][1] + (b[1][1] - a[1][1]) * f),
-      Math.round(a[1][2] + (b[1][2] - a[1][2]) * f),
-    ];
-  }
-  return lut;
-}
-
-function buildContrastLut() {
-  const stops: Array<[number, [number, number, number]]> = [
-    [0.00, [0, 0, 0]],
-    [0.28, [16, 36, 110]],
-    [0.52, [0, 150, 160]],
-    [0.76, [220, 214, 40]],
-    [1.00, [255, 255, 255]],
-  ];
-  const lut: Array<[number, number, number]> = new Array(256);
-  for (let i = 0; i < 256; i++) {
-    const t = i / 255;
-    let a = stops[0];
-    let b = stops[stops.length - 1];
-    for (let sIndex = 0; sIndex < stops.length - 1; sIndex++) {
-      if (t >= stops[sIndex][0] && t <= stops[sIndex + 1][0]) {
-        a = stops[sIndex];
-        b = stops[sIndex + 1];
-        break;
-      }
-    }
-    const f = (t - a[0]) / (b[0] - a[0] || 1);
-    lut[i] = [
-      Math.round(a[1][0] + (b[1][0] - a[1][0]) * f),
-      Math.round(a[1][1] + (b[1][1] - a[1][1]) * f),
-      Math.round(a[1][2] + (b[1][2] - a[1][2]) * f),
-    ];
-  }
-  return lut;
-}
-const COLOR_LUT = buildColorLut();
-const CONTRAST_LUT = buildContrastLut();
 let activeLut = COLOR_LUT;
 let currentPalette: Palette = 'studio';
 
@@ -99,11 +39,15 @@ function setSignal(on) {
 
 function updateButtons() {
   const running = state.running;
+  const busy = running || state.analysing || state.reportOpen;
   els.stopBtn.disabled = !running;
-  els.micBtn.disabled = running;
-  els.tabBtn.disabled = running;
-  els.fileBtn.classList.toggle('is-disabled', running);
-  els.fileBtn.setAttribute('aria-disabled', String(running));
+  els.micBtn.disabled = busy;
+  els.tabBtn.disabled = busy;
+  els.fileBtn.classList.toggle('is-disabled', busy);
+  els.fileBtn.setAttribute('aria-disabled', String(busy));
+  els.analyseBtn.classList.toggle('is-disabled', busy);
+  els.analyseBtn.setAttribute('aria-disabled', String(busy));
+  els.analyseInput.disabled = busy;
   els.pauseBtn.disabled = !running;
   els.toneBtn.textContent = state.mode === 'test' && running ? 'Stop tone' : 'Start tone';
   els.pauseBtn.textContent = state.paused ? 'Resume' : 'Pause';
@@ -1580,6 +1524,7 @@ function init() {
   els.protocolNotice.hidden = window.location.protocol !== 'file:';
   drawIdle();
   bindEvents();
+  initOfflineUI({ setStatus, stopSession, updateButtons });
 
   if ('launchQueue' in window) {
     (window as any).launchQueue.setConsumer(async (params: any) => {

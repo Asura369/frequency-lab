@@ -10,6 +10,8 @@ export const els = {
   tabBtn: $<HTMLButtonElement>('tabBtn'),
   fileBtn: $('fileBtn'),
   fileInput: $<HTMLInputElement>('fileInput'),
+  analyseBtn: $('analyseBtn'),
+  analyseInput: $<HTMLInputElement>('analyseInput'),
   stopBtn: $<HTMLButtonElement>('stopBtn'),
   playerWrap: $('playerWrap'),
   playerHost: $('playerHost'),

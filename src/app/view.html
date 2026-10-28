@@ -15,9 +15,12 @@
       <label class="file-btn" id="fileBtn" for="fileInput">Open file
         <input id="fileInput" type="file" accept="audio/*,video/*">
       </label>
+      <label class="file-btn" id="analyseBtn" for="analyseInput">Analyse file
+        <input id="analyseInput" type="file" accept="audio/*,video/*">
+      </label>
       <button id="stopBtn" class="ghost" type="button" disabled>Stop</button>
     </div>
-    <div class="hint">Audio is analysed in this tab and never uploaded. Drop an audio or video file anywhere.</div>
+    <div class="hint">Audio is analysed in this tab and never uploaded. Play a file live, or use Analyse file for a whole-file report.</div>
   </section>
 
   <div class="notice" id="protocolNotice" hidden>
@@ -31,6 +34,90 @@
       <span id="fileKind">—</span>
     </div>
   </div>
+
+  <section class="report" id="reportView" hidden aria-label="Whole-file analysis">
+    <div class="report-top">
+      <div>
+        <p class="eyebrow">Whole-file analysis</p>
+        <h2 id="reportName">—</h2>
+        <p class="report-meta" id="reportMeta"></p>
+      </div>
+      <button id="reportClose" class="small ghost" type="button">Back to live</button>
+    </div>
+
+    <div class="report-progress" id="reportProgress">
+      <div class="report-progress-head">
+        <span id="reportProgressText">Preparing…</span>
+        <button id="reportCancel" class="small ghost" type="button">Cancel</button>
+      </div>
+      <progress id="reportProgressBar" max="1" value="0"></progress>
+    </div>
+
+    <p class="report-error" id="reportError" hidden></p>
+
+    <div id="reportBody" hidden>
+      <div class="report-grid">
+        <section class="card report-summary">
+          <div class="card-head">
+            <h2>Target</h2>
+            <span class="verdict" id="reportVerdict">—</span>
+          </div>
+          <div class="report-percent"><span id="reportPercent">—</span><span class="unit">%</span></div>
+          <p class="report-target-text" id="reportTargetText"></p>
+          <dl class="report-stats" id="reportStats"></dl>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>Band energy</h2><span class="meta">share of signal energy</span></div>
+          <div class="report-bands" id="reportBands"></div>
+        </section>
+      </div>
+
+      <section class="card report-plot">
+        <div class="card-head"><h2>Whole-file spectrogram</h2><span class="meta" id="reportWindow"></span></div>
+        <canvas id="reportSpectrogram" height="260" aria-label="Whole-file spectrogram, time on the horizontal axis"></canvas>
+        <div class="legend">
+          <span>−100 dB</span>
+          <span class="grad" aria-hidden="true"></span>
+          <span>−30 dB</span>
+          <span class="legend-time">time →</span>
+        </div>
+      </section>
+
+      <section class="card report-plot">
+        <div class="card-head"><h2>Target over time</h2><span class="meta">green = tone present</span></div>
+        <canvas id="reportTimeline" height="96" aria-label="Target presence over time"></canvas>
+      </section>
+
+      <div class="report-grid">
+        <section class="card">
+          <div class="card-head"><h2>Sections</h2><span class="meta">10 equal parts</span></div>
+          <table class="report-table">
+            <thead><tr><th>Time</th><th>Target</th><th>Peak</th><th>Top band</th></tr></thead>
+            <tbody id="reportSections"></tbody>
+          </table>
+        </section>
+        <section class="card">
+          <div class="card-head"><h2>Recurring peaks</h2><span class="meta">by frequency</span></div>
+          <table class="report-table">
+            <thead><tr><th>Hz</th><th>Note</th><th>dB</th><th>Frames</th></tr></thead>
+            <tbody id="reportPeaks"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <section class="card">
+        <div class="card-head"><h2>Listen</h2><span class="meta">the analysed file</span></div>
+        <div id="reportPlayer"></div>
+      </section>
+
+      <div class="actions report-actions">
+        <button id="exportReportJson" type="button">Report JSON</button>
+        <button id="exportReportCsv" type="button">Frames CSV</button>
+        <button id="exportReportPng" type="button">Report PNG</button>
+      </div>
+    </div>
+  </section>
 
   <main class="workspace">
     <section class="card scope" aria-label="Spectrum plots">
